@@ -41,7 +41,7 @@ export default function LoginComp() {
 
         if (res.ok) {
           router.replace("/home");
-          alert(data.message);
+          // alert(data.message);
         } else {
           throw new Error(data.message);
         }
