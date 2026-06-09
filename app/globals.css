@@ -2,21 +2,21 @@
 @config "../tailwind.config.js";
 
 :root {
-  --background: #f0f4f8;
-  --foreground: #0f172a;
-  --color-surface: 255 255 255;
-  --color-surface-elevated: 248 250 252;
-  --color-accent: 99 102 241;
-  --color-accent-muted: 129 140 248;
-  --color-muted: 100 116 139;
-  --color-border: 226 232 240;
-  --color-shadow: 15 23 42;
-  --gradient-from: #e0e7ff;
-  --gradient-via: #f0f4f8;
-  --gradient-to: #ecfdf5;
+  --background: #0b0f19;
+  --foreground: #f1f5f9;
+  --color-surface: 15 23 42;
+  --color-surface-elevated: 30 41 59;
+  --color-accent: 129 140 248;
+  --color-accent-muted: 99 102 241;
+  --color-muted: 148 163 184;
+  --color-border: 51 65 85;
+  --color-shadow: 0 0 0;
+  --gradient-from: #0f172a;
+  --gradient-via: #0b0f19;
+  --gradient-to: #1e1b4b;
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0b0f19;
     --foreground: #f1f5f9;
@@ -31,7 +31,7 @@
     --gradient-via: #0b0f19;
     --gradient-to: #1e1b4b;
   }
-}
+} */
 
 .dark-page {
   --background: #0b0f19;
@@ -105,12 +105,12 @@ body {
   border-color: rgb(var(--color-border) / 0.4);
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   .glass-panel {
     background: rgb(var(--color-surface) / 0.45);
     border-color: rgb(var(--color-border) / 0.4);
   }
-}
+} */
 
 .card-hover {
   transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
