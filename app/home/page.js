@@ -6,11 +6,12 @@ import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 import db from "@/lib/db";
 import { redirect } from "next/navigation";
-import { ExpenseProvider } from "@/context/ExpenseContext";
+import { ExpenseProvider} from "@/context/ExpenseContext";
 
 export default async function Home() {
   let userData;
-  let expenses;
+  let expenses; 
+
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
@@ -30,6 +31,7 @@ export default async function Home() {
   } catch (error) {
     redirect("/login");
   }
+
   return (
     <ExpenseProvider>
       <div className="dark-page app-gradient relative min-h-full flex-1 mb-5 overflow-hidden">

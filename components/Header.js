@@ -1,17 +1,16 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import Loading from "@/app/home/loading";
+import { useExpense } from "@/context/ExpenseContext";
 
 export default function Header({userData}) {
-  const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const timer = useRef(null);
   const dropdownRef = useRef(null);
   const router = useRouter();
   const [state, setState] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-    // Bahar click pe turant close
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (!dropdownRef.current?.contains(e.target)) {
@@ -48,6 +47,7 @@ export default function Header({userData}) {
   };
 
   const handleLogout = async () => {
+    setLoading(true)
     try{
       const res = await fetch("/api/auth/logout",{
         method: "POST"
@@ -66,7 +66,11 @@ export default function Header({userData}) {
     }
   }
 
-  // if(loading) return <Loading/>
+  if(loading) return (
+  <div className="fixed inset-0 z-50 flex items-center justify-center dark-page app-gradient">
+    <div className="h-8 w-8 rounded-full border-2 border-accent border-t-transparent animate-spin" />
+  </div>
+)
 
   return (
     <header className="glass-panel rounded-2xl px-6 py-5 sm:px-8">

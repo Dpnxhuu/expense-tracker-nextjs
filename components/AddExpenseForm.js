@@ -31,7 +31,7 @@ export default function AddExpenseForm() {
       categoryRef.current.value = editData.category;
       desRef.current.value = editData.description;
       setDate(new Date(editData.date));
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({ top: 120, behavior: "smooth" });
     } else {
       amountRef.current.value = "";
       categoryRef.current.value = "";
@@ -127,7 +127,7 @@ export default function AddExpenseForm() {
 
   return (
     <section className="glass-panel h-full rounded-2xl p-6 sm:p-8">
-      <div className="mb-6 border-b border-border/40 pb-5">
+      <div className="relative mb-6 border-b border-border/40 pb-5">
         <p className="section-label mb-1">New Entry</p>
         <h2 className="text-lg font-semibold">
           {editData ? "Edit Expense" : "Add Expense"}
@@ -241,11 +241,11 @@ export default function AddExpenseForm() {
         </div>
 
         {/* Submit */}
-        <div className="flex items-end sm:col-span-2">
+        <div className="flex gap-4 items-center sm:col-span-2">
           <button
             type="submit"
             disabled={loading}
-            className="btn-primary w-full py-3 shadow-glow sm:w-auto sm:px-10"
+            className="btn-primary text-sm px-3 w-full py-3 shadow-glow sm:w-auto sm:px-6"
           >
             {loading
               ? editData
@@ -255,6 +255,14 @@ export default function AddExpenseForm() {
                 ? "Update Expense"
                 : "Add expense"}
           </button>
+          {editData && (
+            <button
+              onClick={() => setEditData(null)}
+              className="btn-outline w-full py-3 sm:w-auto sm:px-6"
+            >
+              Cancel
+            </button>
+          )}
         </div>
       </form>
     </section>

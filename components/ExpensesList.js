@@ -129,10 +129,10 @@ return (
               {formatDate(expense.date)}
             </p>
             <div className="flex gap-2">
-              <button type="button" className="btn-ghost flex-1 py-2">
+              <button onClick={() => setEditData(expense)} type="button" className="btn-ghost flex-1 py-2">
                 Edit
               </button>
-              <button type="button" className="btn-danger flex-1 py-2">
+              <button onClick={() => handleExpenseDelete(expense.id)} type="button" className="btn-danger flex-1 py-2">
                 Delete
               </button>
             </div>
