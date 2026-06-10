@@ -382,6 +382,18 @@ body {
   border: 1px solid rgb(var(--color-border) / 0.6);
   background: rgb(var(--color-surface-elevated) / 0.5);
   padding: 1rem;
+  animation: fadeSlideIn 0.45s ease-out; /* yeh add kar */
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .progress-bar {
