@@ -105,7 +105,7 @@ export default function Header({userData}) {
               {userData?.email?.[0]}
             </div>
             {open && (
-              <div className="absolute right-0 top-[calc(100%+8px)] bg-[#1a1d27] border border-white/10 rounded-xl py-2 w-44 z-10">
+              <div className="absolute right-0 top-[calc(100%+8px)] bg-[#1a1d27] border border-white/10 rounded-xl py-2 w-44 z-999">
                 <div className="px-4 pt-2 pb-3">
                   <p className="text-sm font-medium text-white">
                     {userData?.name}

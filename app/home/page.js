@@ -29,7 +29,13 @@ export default async function Home() {
     ]);
     expenses = JSON.parse(JSON.stringify(rows));
   } catch (error) {
+  if (error.name === "JsonWebTokenError" || error.name === "TokenExpiredError") {
+    const cookieStore = await cookies();
+    cookieStore.delete("token");
     redirect("/login");
+  }
+  throw error;
+  return <div>{error.message}</div>
   }
 
   return (
