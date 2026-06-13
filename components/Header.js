@@ -12,8 +12,11 @@ export default function Header({ userData }) {
   const [loading, setLoading] = useState(false);
   const [buttonLoad, setButtonLoad] = useState(false);
   const [status, setStatus] = useState(() => {
-    if (typeof window === "undefined") return false  // server pe false do
-  return localStorage.getItem("sentStatus") === "true"
+    if (typeof window === "undefined") return false;
+    const sentAt = localStorage.getItem("sentAt");
+    if (!sentAt) return false;
+    const elapsed = Date.now() - parseInt(sentAt);
+    return elapsed < 60000;
   });
 
   const { resendVerification } = useResendVerification();
@@ -78,10 +81,10 @@ export default function Header({ userData }) {
       setButtonLoad(true);
       await resendVerification();
       setStatus(true);
-      localStorage.setItem("sentStatus", "true");
+      localStorage.setItem("sentAt", Date.now().toString());
       setTimeout(() => {
         setStatus(false);
-        localStorage.removeItem("sentStatus");
+        localStorage.removeItem("sentAt");
       }, 60000);
     } catch (error) {
       alert(error.message);
