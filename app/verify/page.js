@@ -3,8 +3,9 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { Suspense } from "react"
 
-export function VerifyPage({ success, error }) {
+function VerifyResult({ success, error }) {
   if (success)
     return (
       <div className="relative dark-page app-gradient min-h-screen flex items-center justify-center px-4 overflow-hidden">
@@ -53,7 +54,7 @@ export function VerifyPage({ success, error }) {
   );
 }
 
-export default function Verify() {
+function Verify() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [state, setState] = useState("invalid");
@@ -89,8 +90,8 @@ export default function Verify() {
 
   if(loading) return <LoadingSpinner/>
 
-  if(state === "success") return <VerifyPage success={true} error={false}/>
-  if(state === "failed") return <VerifyPage success={false} error={true}/>
+  if(state === "success") return <VerifyResult success={true} error={false}/>
+  if(state === "failed") return <VerifyResult success={false} error={true}/>
 
   return (
     <div className="relative dark-page app-gradient min-h-screen flex items-center justify-center px-4 overflow-hidden">
@@ -113,4 +114,12 @@ export default function Verify() {
       </div>
     </div>
   );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <Verify />
+    </Suspense>
+  )
 }
