@@ -6,11 +6,11 @@ import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 import db from "@/lib/db";
 import { redirect } from "next/navigation";
-import { ExpenseProvider} from "@/context/ExpenseContext";
+import { ExpenseProvider } from "@/context/ExpenseContext";
 
 export default async function Home() {
   let userData;
-  let expenses; 
+  let expenses;
 
   try {
     const cookieStore = await cookies();
@@ -19,9 +19,9 @@ export default async function Home() {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     userData = {
-      userId: decoded.userId,
       name: decoded.name,
       email: decoded.email,
+      is_verified: decoded.is_verified,
     };
 
     const [rows] = await db.query("SELECT * FROM expenses WHERE user_id = ?", [
@@ -29,13 +29,15 @@ export default async function Home() {
     ]);
     expenses = JSON.parse(JSON.stringify(rows));
   } catch (error) {
-  if (error.name === "JsonWebTokenError" || error.name === "TokenExpiredError") {
-    const cookieStore = await cookies();
-    cookieStore.delete("token");
-    redirect("/login");
-  }
-  throw error;
-  return <div>{error.message}</div>
+    if (
+      error.name === "JsonWebTokenError" ||
+      error.name === "TokenExpiredError"
+    ) {
+      const cookieStore = await cookies();
+      cookieStore.delete("token");
+      redirect("/login");
+    }
+    throw error;
   }
 
   return (
@@ -45,7 +47,7 @@ export default async function Home() {
         <div className="glow-orb glow-orb-purple -right-32 top-1/2 h-72 w-72 opacity-50" />
 
         <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
-          <Header userData={userData} />
+          <Header userData={userData}/>
 
           <div className="grid gap-6 lg:grid-cols-5">
             <div className="lg:col-span-2">

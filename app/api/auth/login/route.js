@@ -19,7 +19,7 @@ export async function POST(request) {
     if (!isMatch) throw new Error("Invalid credientials!");
 
     const token = jwt.sign(
-      { userId: user.id, email: user.email, name: user.name },
+      {email: user.email, name: user.name, is_verified: user.is_verified },
       process.env.JWT_SECRET,
       { expiresIn: "7d" },
     );

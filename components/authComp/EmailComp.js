@@ -1,9 +1,8 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import AuthShell from "../auth/AuthShell";
-import { useRouter } from "next/navigation";
 
 function validateField(name, value, form) {
   switch (name) {
@@ -27,10 +26,48 @@ function validateField(name, value, form) {
   }
 }
 
+export function VerificationSent({ email }) {
+  return (
+    <div className="dark-page app-gradient min-h-screen flex items-center justify-center px-4">
+      <div className="glass-panel rounded-2xl p-8 max-w-md w-full text-center">
+        
+        {/* Icon */}
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent/10 ring-1 ring-accent/20 mx-auto mb-5">
+          <span className="text-2xl">✉️</span>
+        </div>
+
+        {/* Text */}
+        <p className="section-label mb-2">Almost there</p>
+        <h2 className="text-lg font-semibold mb-2">Verify your email</h2>
+        <p className="text-sm text-muted mb-1">
+          We've sent a verification link to
+        </p>
+        <p className="text-sm font-medium text-accent mb-6 truncate px-4">
+          {email}
+        </p>
+        <p className="text-sm text-muted mb-6">
+          Click the link in the email to activate your account. The link will expire in 24 hours.
+        </p>
+
+        {/* Resend */}
+        <div className="border-t border-border/40 pt-5">
+          <p className="text-xs text-muted/60">
+            Didn't receive the email?{" "}
+            <button className="text-accent hover:text-accent/80 transition-colors font-medium">
+              Resend verification email
+            </button>
+          </p>
+        </div>
+
+      </div>
+    </div>
+  )
+}
+
 export default function EmailComp() {
 
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const [sent, setSent] = useState(false)
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -103,8 +140,7 @@ export default function EmailComp() {
         const data = await res.json();
 
         if(res.ok){
-          alert(data.message)
-          router.replace("/home");
+          setSent(true);
         }else{
           throw new Error(data.message)
         }
@@ -117,6 +153,8 @@ export default function EmailComp() {
     },
     [form, isValid]
   );
+
+  if (sent) return <VerificationSent email={form.email} />
 
   return (
     <AuthShell

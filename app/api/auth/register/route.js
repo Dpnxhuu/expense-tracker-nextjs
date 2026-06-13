@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import db from "@/lib/db";
 import jwt from "jsonwebtoken";
+import { sendVerificationEmail } from "@/lib/mailer";
 
 export async function POST(request) {
   try {
@@ -15,31 +16,22 @@ export async function POST(request) {
 
     const hashedPass = await bcrypt.hash(password, 10);
 
-    const [result] = await db.query(
-      "INSERT INTO users (name, email, password) VALUES (?,?,?)",
-      [name, email, hashedPass],
+    const token = jwt.sign({ name, email }, process.env.JWT_SECRET, {
+      expiresIn: "24h",
+    });
+
+    await db.query(
+      "INSERT INTO users (name, email, password, verification_token) VALUES (?,?,?,?)",
+      [name, email, hashedPass, token],
     );
 
-    const token = jwt.sign(
-      { userId: result.insertId, name, email },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" },
-    );
+    sendVerificationEmail(email, token);
 
-    const response = NextResponse.json(
+    return NextResponse.json(
       { message: "Account created successfully" },
       { status: 201 },
     );
 
-    response.cookies.set("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7,
-    });
-
-    return response;
   } catch (error) {
     return NextResponse.json(
       { message: error.message },
