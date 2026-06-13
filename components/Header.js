@@ -16,10 +16,37 @@ export default function Header({ userData }) {
     const sentAt = localStorage.getItem("sentAt");
     if (!sentAt) return false;
     const elapsed = Date.now() - parseInt(sentAt);
-    return elapsed < 60000;
+    if (elapsed < 60000) return true;
+    localStorage.removeItem("sentAt");
+    return false;
   });
 
   const { resendVerification } = useResendVerification();
+
+  useEffect(() => {
+  if (!status) return
+  // status false hai toh kuch mat karo
+
+  const sentAt = localStorage.getItem("sentAt")
+  if (!sentAt) return
+
+  const elapsed = Date.now() - parseInt(sentAt)
+  const remaining = 60000 - elapsed
+  // kitna time bacha hai
+
+  if (remaining <= 0) {
+    setStatus(false)
+    localStorage.removeItem("sentAt")
+    return
+  }
+
+  const timerRef = setTimeout(() => {
+    setStatus(false)
+    localStorage.removeItem("sentAt")
+  }, remaining) // remaining time baad false karo
+
+  return () => clearTimeout(timerRef) // refresh pe purana timer clear
+}, [status])
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -82,10 +109,6 @@ export default function Header({ userData }) {
       await resendVerification();
       setStatus(true);
       localStorage.setItem("sentAt", Date.now().toString());
-      setTimeout(() => {
-        setStatus(false);
-        localStorage.removeItem("sentAt");
-      }, 60000);
     } catch (error) {
       alert(error.message);
     } finally {
