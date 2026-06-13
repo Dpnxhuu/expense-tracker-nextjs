@@ -3,7 +3,7 @@
 A full-stack personal expense tracking app built with **Next.js 15**, **MySQL**, and **Tailwind CSS**. Track, categorize, and manage your daily expenses with a clean and modern UI.
 
 ## 🔗 Live Demo
-[Click Here](#) <!-- Live link yahan lagana -->
+[Click Here](https://expensetrackerbydpnshuu.vercel.app) <!-- Live link yahan lagana -->
 
 ---
 
