@@ -50,14 +50,14 @@ export function VerificationSent({ email }) {
         </p>
 
         {/* Resend */}
-        <div className="border-t border-border/40 pt-5">
+        {/* <div className="border-t border-border/40 pt-5">
           <p className="text-xs text-muted/60">
             Didn't receive the email?{" "}
             <button className="text-accent hover:text-accent/80 transition-colors font-medium">
               Resend verification email
             </button>
           </p>
-        </div>
+        </div> */}
 
       </div>
     </div>
