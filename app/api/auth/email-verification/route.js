@@ -27,7 +27,7 @@ try{
     )
 
     const jwtToken = jwt.sign(
-        {name: user.name, email: user.email, is_verified: true},
+        {userId: user.id, name: user.name, email: user.email, is_verified: true},
         process.env.JWT_SECRET,
         {expiresIn: "7d"}
     )

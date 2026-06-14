@@ -75,7 +75,7 @@ export default function Statistics({ expenses }) {
           >
             All
           </button>
-          {filteredDAta.map(({ category, id }) => (
+          {categoryData.map(({ category, id }) => (
             <button
               onClick={() => setFilter(category)}
               key={id}

@@ -70,12 +70,12 @@ function Verify() {
     (async () => {
       try {
         const res = await fetch(`/api/auth/email-verification?token=${token}`);
-        const data = await res.json(); // ✅ await fix
+        const data = await res.json(); 
 
         if (res.ok) {
           setState("success");
           setTimeout(() => {
-            router.replace("/home"); // ✅ redirect fix
+            router.replace("/home"); 
           }, 3000);
         } else {
           throw new Error(data.message);
