@@ -119,7 +119,7 @@ export default function AddExpenseForm() {
       setLoading(false);
     }
   };
-
+  
 
   const fieldClass = (field) =>
     `input-base${error[field] === "error" ? " input-error" : ""}${

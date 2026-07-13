@@ -16,7 +16,7 @@ export async function addExpense({amount, category, description, date}) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const [result] = await db.query(
-        "INSERT INTO expenses (user_id, description, amount, category, expense_date) VALUES (?,?,?,?,?)",
+        "INSERT INTO expenses (user_id, description, amount, category, date) VALUES (?,?,?,?,?)",
         [decoded.userId, description, amount, category, date]
     )
 
@@ -46,7 +46,7 @@ export async function updateExpense({id, amount, category, description, date}) {
   
   try{
     await db.query(
-      "UPDATE expenses SET amount = ?, category = ?, description = ?, expense_date = ? WHERE id = ?",
+      "UPDATE expenses SET amount = ?, category = ?, description = ?, date = ? WHERE id = ?",
       [amount, category, description, date, id]
     )
 
