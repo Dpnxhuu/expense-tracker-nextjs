@@ -14,7 +14,7 @@ A full-stack personal expense tracking app built with **Next.js 15**, **MySQL**,
 - 📊 Category-wise breakdown with percentages
 - 📅 Custom date picker
 - 📱 Fully responsive (Mobile + Desktop)
-- ☁️ Cloud MySQL database (Railway)
+- ☁️ Cloud MySQL database (Aiven)
 
 ---
 
