@@ -22,7 +22,7 @@ A full-stack personal expense tracking app built with **Next.js 15**, **MySQL**,
 
 | Frontend | Backend | Database |
 |---|---|---|
-| Next.js 15 | Next.js Server Actions | MySQL (Railway) |
+| Next.js 15 | Next.js Server Actions | MySQL (Aiven) |
 | Tailwind CSS | JWT + HttpOnly Cookies | mysql2 |
 | React Context API | bcrypt | — |
 
