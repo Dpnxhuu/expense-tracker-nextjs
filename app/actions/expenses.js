@@ -37,7 +37,15 @@ export async function addExpense({amount, category, description, date}) {
 
 export async function deleteExpense(id) {
   
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+
+  if(!token){
+        throw new Error("Unauthorized")
+    }
+
  try{
+  jwt.verify(token, process.env.JWT_SECRET);
   //  await db.query(
   //   "DELETE FROM expenses where id = ?",[id]
   // )
@@ -54,7 +62,15 @@ export async function deleteExpense(id) {
 
 export async function updateExpense({id, amount, category, description, date}) {
   
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+
+  if(!token){
+        throw new Error("Unauthorized")
+    }
+
   try{
+    jwt.verify(token, process.env.JWT_SECRET);
     // await db.query(
     //   "UPDATE expenses SET amount = ?, category = ?, description = ?, date = ? WHERE id = ?",
     //   [amount, category, description, date, id]

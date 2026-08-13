@@ -7,13 +7,16 @@ export default function ErrorAlert({ message, redirectTo = "/login" }) {
   const router = useRouter();
 
   useEffect(() => {
-    (async function (){
-    if (message) {
-      alert(message);
-      await axios.post("/api/auth/logout")
-      router.push(redirectTo);
-    }
-    })();
+    if (!message) return;
+
+    const logout = async () => {
+      const logoutPromise = axios.post("/api/auth/logout");
+      alert(message);                                       
+      await logoutPromise;                                    
+      router.push(redirectTo);                               
+    };
+
+    logout();
   }, [message, redirectTo, router]);
 
   return null;
