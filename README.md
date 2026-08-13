@@ -77,7 +77,8 @@ npm run dev
 ---
 
 ## 📁 Project Structure
-<p>
+
+```text
 ├── app/
 │ ├── actions/ # Server Actions (add, update, delete expense)
 │ ├── api/
@@ -91,8 +92,7 @@ npm run dev
 ├── context/ # React Context API
 ├── lib/ # Prisma client, auth helpers, mailer, constants
 └── prisma/ # Prisma schema & migrations
-</p>
----
+```
 
 ## 🙋‍♂️ Author
 **Deepanshu**
