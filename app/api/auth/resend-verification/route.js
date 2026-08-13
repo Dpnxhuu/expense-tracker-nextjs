@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import db from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 import { sendVerificationEmail } from "@/lib/mailer";
 
 export async function GET(request) {
@@ -11,22 +11,32 @@ export async function GET(request) {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const verificationToken = jwt.sign(
-      { name: decoded.name, email: decoded.email },
+    const dbUser = await prisma.user.findUnique({
+      where: {id: decoded.userId}
+    })
+
+    if(!dbUser){
+        return NextResponse.json({message: "Something went wrong!"},{status: 401})
+    }
+
+    const verifyToken = jwt.sign(
+      { name: dbUser.name, email: dbUser.email },
       process.env.JWT_SECRET,
       { expiresIn: "24h" },
     );
 
-    const [result] = await db.query(
-      "UPDATE users SET verification_token = ? WHERE email = ?",
-      [verificationToken, decoded.email],
-    );
+    // const [result] = await db.query(
+    //   "UPDATE users SET verification_token = ? WHERE email = ?",
+    //   [verificationToken, decoded.email],
+    // );
 
-    if (result.affectedRows === 0) {
-      throw new Error("User not found");
-    }
+    const updatedUser = await prisma.user.update({
+      where: {email: dbUser.email},
+      data: {verificationToken: verifyToken}
+    })
 
-    sendVerificationEmail(decoded.email, verificationToken);
+
+    await sendVerificationEmail(updatedUser.email, verifyToken);
 
     return NextResponse.json(
       { message: "verification email sent" },

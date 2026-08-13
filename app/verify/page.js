@@ -60,12 +60,8 @@ function Verify() {
   const [state, setState] = useState("invalid");
   const [loading, setLoading] = useState(true)
 
-    const token = searchParams.get("token");
-    if (!token) {
-      setLoading(false)
-      return;
-    }
-
+  const token = searchParams.get("token");
+    
   useEffect(() => {
     (async () => {
       try {
@@ -86,7 +82,12 @@ function Verify() {
         setLoading(false)
       }
     })();
-  }, []);
+  }, [token, router]);
+
+  if (!token) {
+      setLoading(false)
+      return;
+    }
 
   if(loading) return <LoadingSpinner/>
 

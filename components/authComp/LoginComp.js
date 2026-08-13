@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import Link from "next/link";
 import AuthShell from "../auth/AuthShell";
 import { useRouter } from "next/navigation";
+import { GoogleAuthButton } from "../auth/GoogleAuthButton";
 
 export default function LoginComp() {
   const [loading, setLoading] = useState(false);
@@ -84,13 +85,12 @@ export default function LoginComp() {
               <label htmlFor="password" className="text-sm font-medium">
                 Password
               </label>
-              <button
-                type="button"
-                onClick={() => console.log("Forgot password clicked")}
+              <Link
+                href="/forgot-password"
                 className="text-xs auth-link"
               >
                 Forgot Password?
-              </button>
+              </Link>
             </div>
             <input
               id="password"
@@ -116,7 +116,7 @@ export default function LoginComp() {
 
         <div className="auth-divider my-6">or</div>
 
-        <button type="button" className="btn-google">
+        {/* <button type="button" className="btn-google">
           <svg
             className="h-5 w-5 shrink-0"
             viewBox="0 0 24 24"
@@ -140,7 +140,9 @@ export default function LoginComp() {
             />
           </svg>
           Continue with Google
-        </button>
+        </button> */}
+        
+        <GoogleAuthButton label={"Sign in with google"}/>
 
         <p className="mt-8 text-center text-sm text-muted">
           Don&apos;t have an account?{" "}

@@ -7,11 +7,24 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { useExpense } from "@/context/ExpenseContext";
 
+
+function toLocalDateString(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+
 export default function AddExpenseForm() {
   const { editData, setEditData } = useExpense();
-  const amountRef = useRef("");
-  const categoryRef = useRef("");
-  const desRef = useRef("");
+  return <AddExpenseFormInner key={editData?.id || "new"} editData={editData} setEditData={setEditData} />;
+}
+
+function AddExpenseFormInner({editData, setEditData}) {
+  const amountRef = useRef(null);
+  const categoryRef = useRef(null);
+  const desRef = useRef(null);
 
   const [date, setDate] = useState(null);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -30,7 +43,7 @@ export default function AddExpenseForm() {
       amountRef.current.value = editData.amount;
       categoryRef.current.value = editData.category;
       desRef.current.value = editData.description;
-      setDate(new Date(editData.date));
+      setDate(new Date(editData.expenseDate));
       window.scrollTo({ top: 120, behavior: "smooth" });
     } else {
       amountRef.current.value = "";
@@ -85,7 +98,7 @@ export default function AddExpenseForm() {
           description:
             desRef.current.value.charAt(0).toUpperCase() +
             desRef.current.value.slice(1),
-          date: date.toISOString().split("T")[0],
+          date: toLocalDateString(date),
         });
       } else {
         await addExpense({
@@ -94,7 +107,7 @@ export default function AddExpenseForm() {
           description:
             desRef.current.value.charAt(0).toUpperCase() +
             desRef.current.value.slice(1),
-          date: date.toISOString().split("T")[0],
+          date: toLocalDateString(date),
         });
       }
 

@@ -5,5 +5,5 @@ export const metadata = {
 };
 
 export default function LoginLayout({ children }) {
-  return <>{children}</>;
+  return children;
 }

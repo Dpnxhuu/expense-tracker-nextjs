@@ -7,12 +7,7 @@ export async function POST() {
       { status: 200 },
     );
 
-    response.cookies.set("token", "", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 0,
-      path: "/",
-    });
+    response.cookies.delete("token");
 
     return response;
   } catch (error) {

@@ -1,31 +1,56 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import db from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 import jwt from "jsonwebtoken";
 import { sendVerificationEmail } from "@/lib/mailer";
+import { z } from "zod";
+
+const signupSchema = z.object({
+  name: z.string().min(3, "Name too short"),
+  email: z.string().email("Invalid email"),
+  password: z.string().min(8, "Password must be 8+ chars"),
+});
 
 export async function POST(request) {
   try {
-    const { name, email, password } = await request.json();
+    const body = await request.json();
+        const result = signupSchema.safeParse(body);
+    
+        if (!result.success) {
+          return NextResponse.json(
+            { error: result.error.issues[0]?.message },
+            { status: 400 }
+          );
+        }
+    
+        const { name, email, password } = result.data;
 
-    const [existing] = await db.query("SELECT * FROM users where email = ?", [
-      email,
-    ]);
+    // const [existing] = await db.query("SELECT * FROM users where email = ?", [
+    //   email,
+    // ]);
 
-    if (existing.length > 0) throw new Error("Email already exist");
+    const dbUser = await prisma.user.findUnique({
+      where: {email}
+    })
+
+    if (dbUser) throw new Error("User already exist");
 
     const hashedPass = await bcrypt.hash(password, 10);
 
-    const token = jwt.sign({ name, email }, process.env.JWT_SECRET, {
+    const verifyToken = jwt.sign({ name, email }, process.env.JWT_SECRET, {
       expiresIn: "24h",
     });
 
-    await db.query(
-      "INSERT INTO users (name, email, password, verification_token) VALUES (?,?,?,?)",
-      [name, email, hashedPass, token],
-    );
+    // await db.query(
+    //   "INSERT INTO users (name, email, password, verification_token) VALUES (?,?,?,?)",
+    //   [name, email, hashedPass, token],
+    // );
 
-    sendVerificationEmail(email, token);
+    await prisma.user.create({
+      data:{name, email, password: hashedPass, verificationToken: verifyToken}
+    })
+
+    await sendVerificationEmail(email, verifyToken);
 
     return NextResponse.json(
       { message: "Account created successfully" },

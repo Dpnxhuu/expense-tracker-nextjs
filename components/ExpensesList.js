@@ -17,6 +17,7 @@ function formatDate(dateStr) {
     day: "numeric",
     month: "short",
     year: "numeric",
+    timeZone: "UTC", 
   });
 }
 
@@ -84,7 +85,7 @@ return (
                 </td>
                 <td className="px-4 py-4 text-muted">{expense.description}</td>
                 <td className="px-4 py-4 whitespace-nowrap text-muted">
-                  {formatDate(expense.date)}
+                  {formatDate(expense.expenseDate)}
                 </td>
                 <td className="px-4 py-4 text-right">
                   <div className="inline-flex gap-2">
@@ -126,7 +127,7 @@ return (
               </span>
             </div>
             <p className="mb-4 text-xs text-muted">
-              {formatDate(expense.date)}
+              {formatDate(expense.expenseDate)}
             </p>
             <div className="flex gap-2">
               <button onClick={() => setEditData(expense)} type="button" className="btn-ghost flex-1 py-2">

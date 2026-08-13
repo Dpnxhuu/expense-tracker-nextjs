@@ -1,40 +1,46 @@
 import { NextResponse } from "next/server";
-import db from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 import jwt from "jsonwebtoken";
 
 export async function GET(request){
 try{
-
     const token = request.nextUrl.searchParams.get('token');
     if(!token) return NextResponse.json({message: 'Token not found'}, {status: 404})
 
-    jwt.verify(token, process.env.JWT_SECRET)
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
-    const [rows] = await db.query(
-        "SELECT * FROM users WHERE verification_token = ?",
-        [token]
-    )
+    // const [rows] = await db.query(
+    //     "SELECT * FROM users WHERE verification_token = ?",
+    //     [token]
+    // )
 
-    if(rows.length === 0){
+    const dbUser = await prisma.user.findUnique({
+        where: {email: decoded.email, verificationToken: token}
+    })
+
+    if(!dbUser){
         return NextResponse.json({message: "Invalid token"},{status: 404})
     }
 
-    const user = rows[0]
+    // await db.query(
+    //     "UPDATE users SET is_verified = ?, verification_token = ? WHERE id = ?",
+    //     [true, null, user.id]
+    // )
 
-    db.query(
-        "UPDATE users SET is_verified = ?, verification_token = ? WHERE id = ?",
-        [true, null, user.id]
-    )
+    const updatedUser = await prisma.user.update({
+        where:{email: decoded.email},
+        data: {isVerified: true, verificationToken: null}
+    })
 
-    const jwtToken = jwt.sign(
-        {userId: user.id, name: user.name, email: user.email, is_verified: true},
+    const loginToken = jwt.sign(
+        {userId: updatedUser.id, tokenVersion: updatedUser.tokenVersion},
         process.env.JWT_SECRET,
         {expiresIn: "7d"}
     )
 
     const response = NextResponse.json({message: "Verification successfull"},{status: 200})
 
-    response.cookies.set("token", jwtToken,{
+    response.cookies.set("token", loginToken,{
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",

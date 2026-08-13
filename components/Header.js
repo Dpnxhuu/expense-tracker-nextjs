@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import useResendVerification from "@/hooks/useResendVerification";
+// import useResendVerification from "@/hooks/useResendVerification";
 
 export default function Header({ userData }) {
   const [open, setOpen] = useState(false);
@@ -10,65 +10,66 @@ export default function Header({ userData }) {
   const router = useRouter();
   const [state, setState] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [buttonLoad, setButtonLoad] = useState(false);
-  const [status, setStatus] = useState(() => {
-    if (typeof window === "undefined") return false;
-    const sentAt = localStorage.getItem("sentAt");
-    if (!sentAt) return false;
-    const elapsed = Date.now() - parseInt(sentAt);
-    if (elapsed < 60000) return true;
-    localStorage.removeItem("sentAt");
-    return false;
-  });
+  
+  // const [buttonLoad, setButtonLoad] = useState(false);
+  // const [status, setStatus] = useState(() => {
+  //   if (typeof window === "undefined") return false;
+  //   const sentAt = localStorage.getItem("sentAt");
+  //   if (!sentAt) return false;
+  //   const elapsed = Date.now() - parseInt(sentAt);
+  //   if (elapsed < 60000) return true;
+  //   localStorage.removeItem("sentAt");
+  //   return false;
+  // });
 
-  const { resendVerification } = useResendVerification();
+  // const { resendVerification } = useResendVerification();
 
-  useEffect(() => {
-  if (!status) return
-  // status false hai toh kuch mat karo
+//   useEffect(() => {
+//   if (!status) return
+//   // status false hai toh kuch mat karo
 
-  const sentAt = localStorage.getItem("sentAt")
-  if (!sentAt) return
+//   const sentAt = localStorage.getItem("sentAt")
+//   if (!sentAt) return
 
-  const elapsed = Date.now() - parseInt(sentAt)
-  const remaining = 60000 - elapsed
-  // kitna time bacha hai
+//   const elapsed = Date.now() - parseInt(sentAt)
+//   const remaining = 60000 - elapsed
+//   // kitna time bacha hai
 
-  if (remaining <= 0) {
-    setStatus(false)
-    localStorage.removeItem("sentAt")
-    return
-  }
+//   if (remaining <= 0) {
+//     setStatus(false)
+//     localStorage.removeItem("sentAt")
+//     return
+//   }
 
-  const timerRef = setTimeout(() => {
-    setStatus(false)
-    localStorage.removeItem("sentAt")
-  }, remaining) // remaining time baad false karo
+//   const timerRef = setTimeout(() => {
+//     setStatus(false)
+//     localStorage.removeItem("sentAt")
+//   }, remaining) // remaining time baad false karo
 
-  return () => clearTimeout(timerRef) // refresh pe purana timer clear
-}, [status])
+//   return () => clearTimeout(timerRef) // refresh pe purana timer clear
+// }, [status])
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (!dropdownRef.current?.contains(e.target)) {
-        clearTimeout(timer.current);
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  // useEffect(() => {
+  //   const handleClickOutside = (e) => {
+  //     if (!dropdownRef.current?.contains(e.target)) {
+  //       clearTimeout(timer.current);
+  //       setOpen(false);
+  //     }
+  //   };
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => document.removeEventListener("mousedown", handleClickOutside);
+  // }, []);
 
   const handleMouseEnter = () => {
     clearTimeout(timer.current);
-    if (state) return;
-    timer.current = setTimeout(() => setOpen(true), 400);
+    // if (state) return;
+    timer.current = setTimeout(() => setOpen(true), 50);
   };
 
   const handleMouseLeave = () => {
     clearTimeout(timer.current);
-    if (state) return;
-    timer.current = setTimeout(() => setOpen(false), 800);
+    // if (state) return;
+    timer.current = setTimeout(() => setOpen(false), 150);
   };
 
   const handleClick = () => {
@@ -103,18 +104,18 @@ export default function Header({ userData }) {
     }
   };
 
-  const resend = async () => {
-    try {
-      setButtonLoad(true);
-      await resendVerification();
-      setStatus(true);
-      localStorage.setItem("sentAt", Date.now().toString());
-    } catch (error) {
-      alert(error.message);
-    } finally {
-      setButtonLoad(false);
-    }
-  };
+  // const resend = async () => {
+  //   try {
+  //     setButtonLoad(true);
+  //     await resendVerification();
+  //     setStatus(true);
+  //     localStorage.setItem("sentAt", Date.now().toString());
+  //   } catch (error) {
+  //     alert(error.message);
+  //   } finally {
+  //     setButtonLoad(false);
+  //   }
+  // };
 
   if (loading)
     return (
@@ -165,7 +166,7 @@ export default function Header({ userData }) {
                     {userData?.email}
                   </p>
                   <div className="mt-2">
-                    {userData?.is_verified ? (
+                    {userData?.isVerified ? (
                       <span className="inline-flex items-center gap-1 text-xs text-green-400 bg-green-400/10 px-2 py-0.5 rounded-full ring-1 ring-green-400/20">
                         ✓ Verified
                       </span>
@@ -174,7 +175,7 @@ export default function Header({ userData }) {
                         <span className="inline-flex items-center gap-1 text-xs text-red-400 bg-red-400/10 px-2 py-0.5 rounded-full ring-1 ring-red-400/20">
                           ✗ Not Verified
                         </span>
-                        <button
+                        {/* <button
                           onClick={resend}
                           disabled={status}
                           className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-accent/10 hover:bg-accent/20 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${status ? "text-green-400 bg-green-400/10" : "text-accent"}`}
@@ -184,7 +185,7 @@ export default function Header({ userData }) {
                             : status
                               ? "Success"
                               : "Resend Email →"}
-                        </button>
+                        </button> */}
                       </div>
                     )}
                   </div>

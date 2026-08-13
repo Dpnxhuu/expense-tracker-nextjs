@@ -17,7 +17,7 @@ export default function Statistics({ expenses }) {
   );
   const [filter, setFilter] = useState("All");
 
-  const categoryMap = expenses.reduce((acc, curr) => {
+  const categoryMap = expenses?.reduce((acc, curr) => {
     const cat = curr.category;
     if (!acc[cat]) {
       acc[cat] = { total: 0, count: 0, id: curr.id };
@@ -54,12 +54,12 @@ export default function Statistics({ expenses }) {
           <p className="text-sm font-medium text-muted">Total Expenses</p>
           <p className="mt-1 text-4xl font-bold tracking-tight text-accent sm:text-5xl">
             {formatCurrency(
-              expenses.reduce((acc, curr) => acc + Number(curr.amount), 0),
+              expenses?.reduce((acc, curr) => acc + Number(curr.amount), 0),
             )}
           </p>
           <p className="mt-2 flex items-center gap-3 text-xs text-muted">
             <span className="inline-flex h-1 w-1.5 rounded-full bg-accent" />
-            {`${expenses.length} transactions recorded`}
+            {`${expenses?.length} transactions recorded`}
           </p>
         </div>
 
