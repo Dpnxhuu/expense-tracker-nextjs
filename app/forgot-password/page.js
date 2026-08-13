@@ -1,12 +1,12 @@
 "use client";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { z } from "zod";
 
 const emailSchema = z.string().email("Invalid email");
 
-export default function ForgotPasswordForm() {
+function ForgotPasswordForm() {
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -113,5 +113,14 @@ export default function ForgotPasswordForm() {
       </div>
     </section>
     </div>
+  );
+}
+
+
+export default function ForgotPasswordPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ForgotPasswordForm />
+    </Suspense>
   );
 }

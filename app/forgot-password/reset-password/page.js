@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { z } from "zod";
+import { Suspense } from "react";
 
 const resetSchema = z
   .object({
@@ -15,7 +16,7 @@ const resetSchema = z
     path: ["confirmPass"],
   });
 
-export default function ResetPasswordForm() {
+function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const router = useRouter();
@@ -100,5 +101,13 @@ export default function ResetPasswordForm() {
         </div>
       </section>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
