@@ -47,7 +47,7 @@ npm install
 ```
 
 ### 3. Environment variables setup
-`.env` file banao:
+`.env` file:
 ```env
 DB_HOST=your_db_host
 DB_PORT=your_db_port
@@ -77,6 +77,7 @@ npm run dev
 ---
 
 ## 📁 Project Structure
+<p>
 ├── app/
 │ ├── actions/ # Server Actions (add, update, delete expense)
 │ ├── api/
@@ -90,7 +91,7 @@ npm run dev
 ├── context/ # React Context API
 ├── lib/ # Prisma client, auth helpers, mailer, constants
 └── prisma/ # Prisma schema & migrations
-
+</p>
 ---
 
 ## 🙋‍♂️ Author
