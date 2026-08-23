@@ -18,8 +18,15 @@ export default async function Home() {
 }
 
   const allExpense = await prisma.expense.findMany({
-    where: { userId: userData?.id },
-  });
+  where: { userId: userData?.id },
+  select: {
+    id: true,
+    amount: true,
+    category: true,
+    description: true,
+    expenseDate: true,
+  },
+});
   const expenses = JSON.parse(JSON.stringify(allExpense));
 
   return (
