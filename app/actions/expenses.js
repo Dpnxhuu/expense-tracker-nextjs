@@ -26,7 +26,7 @@ export async function addExpense({amount, category, description, date}) {
 
     if(!newExpense) throw new Error("Expense not added, db error!")
 
-      console.log("Expense date:", newExpense.expenseDate)
+      // console.log("Expense date:", newExpense.expenseDate)
 
     return {message: "Expense added"};
 

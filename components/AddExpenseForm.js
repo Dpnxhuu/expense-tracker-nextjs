@@ -241,7 +241,7 @@ function AddExpenseFormInner({editData, setEditData}) {
           )}
 
           {showCalendar && (
-            <div className="absolute bottom-full left-0 z-[999] mt-1 rounded-xl border border-border/40 bg-surface p-3 shadow-lg">
+            <div className="absolute bottom-full left-0 z-99 mt-1 rounded-xl border border-border/40 bg-surface p-3 shadow-lg">
               <DayPicker
                 mode="single"
                 selected={date}
