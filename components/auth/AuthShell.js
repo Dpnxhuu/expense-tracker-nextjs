@@ -1,5 +1,5 @@
 import Link from "next/link";
-import AuthNavbar from "@/components/auth/AuthNavbar";
+import AuthNavbar from "../auth/AuthNavbar";
 
 export default function AuthShell({ children, title, subtitle }) {
   return (

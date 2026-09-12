@@ -1,5 +1,7 @@
 "use client";
 
+import { signIn } from "next-auth/react";
+
 export function GoogleIcon({ className = "h-5 w-5" }) {
   return (
     <svg className={className} viewBox="0 0 24 24" aria-hidden>
@@ -24,16 +26,10 @@ export function GoogleIcon({ className = "h-5 w-5" }) {
 }
 
 export function GoogleAuthButton({ label }) {
-  const handleGoogleLogin = () => {
-    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_APP_URL}/api/auth/google/callback&response_type=code&scope=openid email profile`;
-
-    window.location.href = googleAuthUrl;
-  };
-
   return (
     <button
       type="button"
-      onClick={handleGoogleLogin}
+      onClick={() => signIn("google", { callbackUrl: "/home" })}
       className="btn-google"
     >
       <GoogleIcon />

@@ -1,6 +1,6 @@
 import Link from "next/link";
-import LandingNavbar from "@/components/landing/Navbar";
-import LandingFooter from "@/components/landing/Footer";
+import LandingNavbar from "../components/landing/Navbar";
+import LandingFooter from "../components/landing/Footer";
 
 const FEATURES = [
   {

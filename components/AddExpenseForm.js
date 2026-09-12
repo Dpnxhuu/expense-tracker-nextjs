@@ -2,7 +2,7 @@
 import { CATEGORIES } from "@/lib/constants";
 import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { addExpense, updateExpense } from "@/app/actions/expenses";
+import { addExpense, updateExpense } from "../app/actions/expenses";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { useExpense } from "@/context/ExpenseContext";
