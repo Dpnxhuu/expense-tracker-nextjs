@@ -1,7 +1,7 @@
 "use client"
-import { deleteExpense } from "@/app/actions/expenses";
-import { useExpense } from "@/context/ExpenseContext";
-import { CATEGORY_COLORS } from "@/lib/constants";
+import { deleteExpense } from "../app/actions/expenses";
+import { useExpense } from "../context/ExpenseContext";
+import { CATEGORY_COLORS } from "..//lib/constants";
 import { useRouter } from "next/navigation";
 
 function formatCurrency(amount) {

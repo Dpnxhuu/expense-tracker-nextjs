@@ -1,9 +1,9 @@
-import Header from "@/components/Header";
+import Header from "../../components/Header";
 import AddExpenseForm from "../../components/AddExpenseForm";
-import Statistics from "@/components/Statistics";
-import ExpensesList from "@/components/ExpensesList";
-import { prisma } from "@/lib/prisma";
-import { ExpenseProvider } from "@/context/ExpenseContext";
+import Statistics from "../../components/Statistics";
+import ExpensesList from "../../components/ExpensesList";
+import { prisma } from "../../lib/prisma";
+import { ExpenseProvider } from "../../context/ExpenseContext";
 import { auth } from "../../auth";
 import { redirect } from "next/navigation";
 
@@ -12,12 +12,14 @@ import { redirect } from "next/navigation";
 export default async function Home() {
   const session = await auth();
 
+  // console.log(session)
+
   if (!session) {
      redirect("/login?expired=1");
    }
 
   const allExpense = await prisma.expense.findMany({
-  where: { userId: session?.user?.id },
+  where: { userId: Number(session?.user?.id) },
   select: {
     id: true,
     amount: true,
@@ -35,7 +37,7 @@ export default async function Home() {
         <div className="glow-orb glow-orb-purple -right-32 top-1/2 h-72 w-72 opacity-50" />
 
         <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
-          <Header userData={session} />
+          <Header session={session} />
 
           <div className="grid gap-6 lg:grid-cols-5">
             <div className="lg:col-span-2">

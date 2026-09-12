@@ -183,7 +183,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         const dbUser = await prisma.user.findUnique({
           where: {
-            id: user.id,
+            id: Number(user.id),
           },
         });
 
@@ -201,7 +201,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       const dbUser = await prisma.user.findUnique({
         where: {
-          id: token.id,
+          id: Number(token.id),
         },
       });
 

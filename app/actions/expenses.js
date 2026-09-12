@@ -1,88 +1,85 @@
-"use server"
-import { prisma } from '@/lib/prisma';
-import jwt from "jsonwebtoken"
-import { cookies } from 'next/headers'
+"use server";
+import { prisma } from "../../lib/prisma";
+import { auth } from "../../auth";
+import { revalidatePath } from "next/cache";
 
-export async function addExpense({amount, category, description, date}) {
-  try{
-      
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
+export async function addExpense({ amount, category, description, date }) {
+  try {
+    const session = await auth();
 
-    if(!token){
-        throw new Error("Unauthorized")
+    if (!session) {
+      throw new Error("Unauthorized");
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // const [result] = await db.query(
-    //     "INSERT INTO expenses (user_id, description, amount, category, date) VALUES (?,?,?,?,?)",
-    //     [decoded.userId, description, amount, category, date]
-    // )
-
     const newExpense = await prisma.expense.create({
-      data: {userId: decoded.userId, amount, category, description, expenseDate: new Date(date)}
-    })
+      data: {
+        userId: session.user.id,
+        amount,
+        category,
+        description,
+        expenseDate: new Date(date),
+      },
+    });
 
-    if(!newExpense) throw new Error("Expense not added, db error!")
+    if (!newExpense) throw new Error("Expense not added, db error!");
 
-      // console.log("Expense date:", newExpense.expenseDate)
+    revalidatePath("/home");
 
-    return {message: "Expense added"};
-
-  }catch(error){
-    throw new Error(error.message)
+    return { message: "Expense added" };
+  } catch (error) {
+    throw new Error(error.message);
   }
 }
 
 export async function deleteExpense(id) {
-  
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+  const session = await auth();
 
-  if(!token){
-        throw new Error("Unauthorized")
-    }
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
 
- try{
-  jwt.verify(token, process.env.JWT_SECRET);
-  //  await db.query(
-  //   "DELETE FROM expenses where id = ?",[id]
-  // )
+  try {
+    const expense = await prisma.expense.findFirst({
+      where: { id, userId: session.user.id },
+    });
 
-  await prisma.expense.delete({
-    where: {id}
-  })
-  return {message: "Expense deleted!"}
- }catch(error){
-  throw new Error(error.message)
- }
+    if (!expense) throw new Error("Expense not found or not yours!");
 
+    await prisma.expense.delete({
+      where: { id },
+    });
+
+    revalidatePath("/home");
+
+    return { message: "Expense deleted!" };
+  } catch (error) {
+    throw new Error(error.message);
+  }
 }
 
-export async function updateExpense({id, amount, category, description, date}) {
-  
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+export async function updateExpense({ id, amount, category, description, date }) {
+  const session = await auth();
 
-  if(!token){
-        throw new Error("Unauthorized")
-    }
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
 
-  try{
-    jwt.verify(token, process.env.JWT_SECRET);
-    // await db.query(
-    //   "UPDATE expenses SET amount = ?, category = ?, description = ?, date = ? WHERE id = ?",
-    //   [amount, category, description, date, id]
-    // )
+  try {
+    const expense = await prisma.expense.findFirst({
+      where: { id, userId: session.user.id },
+    });
+
+    if (!expense) throw new Error("Expense not found or not yours!");
 
     await prisma.expense.update({
-      where: {id},
-      data: {amount, category, description, expenseDate: new Date(date)}
-    })
+      where: { id },
+      data: { amount, category, description, expenseDate: new Date(date) },
+    });
 
-    return {message: "Edited"}
-  }catch(error){
-    throw new Error(error.message)
+    revalidatePath("/home");
+
+    return { message: "Edited" };
+  } catch (error) {
+    throw new Error(error.message);
   }
 }

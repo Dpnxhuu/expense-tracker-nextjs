@@ -1,5 +1,5 @@
 "use client";
-import { CATEGORY_COLORS } from "@/lib/constants";
+import { CATEGORY_COLORS } from "../lib/constants";
 import { useState } from "react";
 
 function formatCurrency(amount) {
