@@ -1,11 +1,13 @@
 "use client";
-import { CATEGORIES } from "../lib/constants";
+import { CATEGORIES } from "../../lib/constants";
 import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { addExpense, updateExpense } from "../app/actions/expenses";
+import { addExpense, updateExpense } from "../../app/actions/expenses";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
-import { useExpense } from "../context/ExpenseContext";
+import { useSelector, useDispatch } from "react-redux";
+import { setEditData } from "../../store/feature/expense/expenseSlice";
+import toast from "react-hot-toast";
 
 
 function toLocalDateString(date) {
@@ -17,8 +19,9 @@ function toLocalDateString(date) {
 
 
 export default function AddExpenseForm() {
-  const { editData, setEditData } = useExpense();
-  return <AddExpenseFormInner key={editData?.id || "new"} editData={editData} setEditData={setEditData} />;
+  const editData = useSelector((state) => state.expense.editData);
+  const dispatch = useDispatch();
+  return <AddExpenseFormInner key={editData?.id || "new"} editData={editData} setEditData={(data) => dispatch(setEditData(data))} />;
 }
 
 function AddExpenseFormInner({editData, setEditData}) {
@@ -127,7 +130,7 @@ function AddExpenseFormInner({editData, setEditData}) {
 
       router.refresh();
     } catch (error) {
-      alert(error.message);
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }

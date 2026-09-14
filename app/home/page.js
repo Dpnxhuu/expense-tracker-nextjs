@@ -1,18 +1,13 @@
-import Header from "../../components/Header";
-import AddExpenseForm from "../../components/AddExpenseForm";
-import Statistics from "../../components/Statistics";
-import ExpensesList from "../../components/ExpensesList";
+import Header from "../../components/main-comps/Header";
+import AddExpenseForm from "../../components/main-comps/AddExpenseForm";
+import Statistics from "../../components/main-comps/Statistics";
+import ExpensesList from "../../components/main-comps/ExpensesList";
 import { prisma } from "../../lib/prisma";
-import { ExpenseProvider } from "../../context/ExpenseContext";
 import { auth } from "../../auth";
 import { redirect } from "next/navigation";
 
-
-
 export default async function Home() {
   const session = await auth();
-
-  // console.log(session)
 
   if (!session) {
      redirect("/login?expired=1");
@@ -31,7 +26,6 @@ export default async function Home() {
   const expenses = JSON.parse(JSON.stringify(allExpense));
 
   return (
-    <ExpenseProvider>
       <div className="dark-page app-gradient relative min-h-full flex-1 mb-5 overflow-hidden">
         <div className="glow-orb glow-orb-accent -left-32 top-0 h-80 w-80 opacity-60" />
         <div className="glow-orb glow-orb-purple -right-32 top-1/2 h-72 w-72 opacity-50" />
@@ -51,6 +45,5 @@ export default async function Home() {
           <ExpensesList expenses={expenses} />
         </div>
       </div>
-    </ExpenseProvider>
   );
 }

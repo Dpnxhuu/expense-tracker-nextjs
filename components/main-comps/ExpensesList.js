@@ -1,7 +1,8 @@
 "use client"
-import { deleteExpense } from "../app/actions/expenses";
-import { useExpense } from "../context/ExpenseContext";
-import { CATEGORY_COLORS } from "..//lib/constants";
+import { deleteExpense } from "../../app/actions/expenses";
+import { useDispatch } from "react-redux";
+import { setEditData } from "../../store/feature/expense/expenseSlice";
+import { CATEGORY_COLORS } from "../../lib/constants";
 import { useRouter } from "next/navigation";
 
 function formatCurrency(amount) {
@@ -23,7 +24,7 @@ function formatDate(dateStr) {
 
 export default function ExpensesList({ expenses }) {
 
-  const {setEditData} = useExpense();
+  const dispatch = useDispatch();
     
   const router = useRouter();
 
@@ -89,7 +90,7 @@ return (
                 </td>
                 <td className="px-4 py-4 text-right">
                   <div className="inline-flex gap-2">
-                    <button onClick={()=> setEditData(expense)} type="button" className="btn-ghost">
+                    <button onClick={()=> dispatch(setEditData(expense))} type="button" className="btn-ghost">
                       Edit
                     </button>
                     <button
@@ -130,7 +131,7 @@ return (
               {formatDate(expense.expenseDate)}
             </p>
             <div className="flex gap-2">
-              <button onClick={() => setEditData(expense)} type="button" className="btn-ghost flex-1 py-2">
+              <button onClick={() => dispatch(setEditData(expense))} type="button" className="btn-ghost flex-1 py-2">
                 Edit
               </button>
               <button onClick={() => handleExpenseDelete(expense.id)} type="button" className="btn-danger flex-1 py-2">
@@ -140,15 +141,6 @@ return (
           </article>
         ))}
       </div>
-
-      {/* Empty state — visible when no data (hidden for now with sample data) */}
-      {/* Uncomment when INITIAL_EXPENSES is empty:
-      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border/60 py-16 text-center">
-        <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-accent/10 text-2xl ring-1 ring-accent/20">📋</span>
-        <p className="text-base font-medium">No expenses yet</p>
-        <p className="mt-1 max-w-sm text-sm text-muted">Add your first expense using the form above.</p>
-      </div>
-      */}
     </section>
     )}
     </>
