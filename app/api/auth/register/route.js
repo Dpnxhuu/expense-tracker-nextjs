@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "../../../../lib/prisma";
 import jwt from "jsonwebtoken";
-import { sendVerificationEmail } from "@/lib/mailer";
+import { sendVerificationEmail } from "../../../../lib/mailer";
 import { z } from "zod";
 
 const signupSchema = z.object({
