@@ -41,7 +41,7 @@ export default function Header({ session }) {
 
   return (
     <header className="glass-panel rounded-2xl px-6 py-5 sm:px-8">
-      <div className="flex gap-10 sm:items-center sm:justify-between">
+      <div className="flex gap-12 sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/20 text-lg font-bold text-accent ring-1 ring-accent/20">
             ₹
