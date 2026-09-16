@@ -4,7 +4,7 @@ import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { CredentialsSignin } from "next-auth";
 import { z } from "zod";
-import bcrypt from "bcryptjs";
+import {authorizeUser} from "./lib/authorizeUser"
 import { NextResponse } from "next/server";
 
 import { prisma } from "./lib/prisma";
@@ -50,6 +50,7 @@ adapter.linkAccount = async (account) => {
     },
   });
 };
+
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter,
@@ -111,37 +112,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         },
       },
 
-      async authorize(credentials) {
-        const parsed = credentialsSchema.safeParse(credentials);
-
-        if (!parsed.success) {
-          throw new InvalidCredentialsError();
-        }
-
-        const { email, password } = parsed.data;
-
-        const user = await prisma.user.findUnique({
-          where: {
-            email,
-          },
-        });
-
-        if (!user || !user.password) {
-          throw new InvalidCredentialsError();
-        }
-
-        if (!user.emailVerified) {
-          throw new UnverifiedEmailError();
-        }
-
-        const isValid = await bcrypt.compare(password, user.password);
-
-        if (!isValid) {
-          throw new InvalidCredentialsError();
-        }
-
-        return user;
-      },
+      authorize: authorizeUser, // 🆕 ab yahan seedha reference diya
     }),
   ],
 

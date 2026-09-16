@@ -28,7 +28,7 @@ try{
         }
     })
 
-    return NextResponse.json({message: "Verification successfull"},{status: 200})
+    return NextResponse.json({message: "Verification successful"},{status: 200})
 
 }catch(error){
     console.error(error)
