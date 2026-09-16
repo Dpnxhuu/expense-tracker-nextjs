@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "../../../lib/prisma";
 import { z } from "zod";
-import { ResetPasswordEmail } from "@/lib/mailer";
+import { ResetPasswordEmail } from "../../../lib/mailer";
 import crypto from "crypto"
 
 const emailSchema = z.object({
