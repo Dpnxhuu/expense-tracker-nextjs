@@ -13,7 +13,6 @@ model User {
   email              String    @unique @db.VarChar(150)
   password           String?   @db.VarChar(255)
   verificationToken  String?   @db.VarChar(255) @map("verification_token")
-  passResetToken     String?   @db.VarChar(255) @map("password_reset_token")
   tokenVersion       Int       @default(0) @map("token_version")
   createdAt          DateTime  @default(now()) @map("created_at")
 
@@ -75,10 +74,18 @@ model Session {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model PasswordToken {
+  identifier String
+  token String @unique
+  expires DateTime
+
+  @@id([identifier, token])
+}
+
 model VerificationToken {
   identifier String
-  token      String   @unique
-  expires    DateTime
+  token String @unique
+  expires DateTime
 
   @@id([identifier, token])
 }

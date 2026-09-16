@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
 import { prisma } from "../../../lib/prisma";
-import nodemailer from "nodemailer";
 import { z } from "zod";
+import { ResetPasswordEmail } from "@/lib/mailer";
+import crypto from "crypto"
 
 const emailSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -27,44 +27,21 @@ export async function POST(req) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: "If this email exists, a reset link has been sent!" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid credentials!" }, { status: 400 });
     }
 
-    const token = jwt.sign(
-      { id: user.id, email },
-      process.env.JWT_SECRET,
-      { expiresIn: "15m" }
-    );
+    if(!user.emailVerified){
+      return NextResponse.json({error: "Email not verified!"},{status: 400})
+    }
 
-    await prisma.user.update({
-      where: { email },
-      data: { passResetToken: token },
+    const token = crypto.randomUUID();
+    const expires = new Date(Date.now() + 1000 * 60 * 15)
+
+    await prisma.passwordToken.create({
+      data: { identifier: email, token, expires},
     });
-
-    const baseurl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const resetLink = `${baseurl}/forgot-password/reset-password?token=${token}`;
-
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
-    await transporter
-      .sendMail({
-        from: `"Expense Tracker" <${process.env.GMAIL_USER}>`,
-        to: email,
-        subject: "Reset your password",
-        html: `
-        <h2>Reset your password</h2>
-        <p>Click the link below to reset your password:</p>
-        <a href="${resetLink}">Reset Password</a>
-        <p>This link will expire in 15 minutes.</p>
-      `,
-      })
-      .catch(console.error);
+    
+    await ResetPasswordEmail(token, email);
 
     return NextResponse.json({ message: "Reset email sent!" }, { status: 200 });
   } catch (error) {

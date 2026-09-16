@@ -1,9 +1,10 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import LoadingSpinner from "../../components/ui/LoadingSpinner";
 import { Suspense } from "react"
+import axios from "axios";
 
 function VerifyResult({ success, error }) {
   if (success)
@@ -21,7 +22,7 @@ function VerifyResult({ success, error }) {
             Your account has been successfully verified.
           </p>
           <h3 className="text-lg font-semibold mb-2">
-            Redirecting you to home page...
+            Redirecting you to Login page...
           </h3>
         </div>
       </div>
@@ -59,23 +60,22 @@ function Verify() {
   const router = useRouter();
   const [state, setState] = useState("invalid");
   const [loading, setLoading] = useState(true)
+  const hasRun = useRef(false);
 
   const token = searchParams.get("token");
     
   useEffect(() => {
+
+    if (hasRun.current) return; 
+    hasRun.current = true;
+
     (async () => {
       try {
-        const res = await fetch(`/api/auth/email-verification?token=${token}`);
-        const data = await res.json(); 
-
-        if (res.ok) {
+        const res = await axios.get(`/api/auth/email-verification?token=${token}`);
           setState("success");
           setTimeout(() => {
-            router.replace("/home"); 
+            router.replace("/login"); 
           }, 3000);
-        } else {
-          throw new Error(data.message);
-        }
       } catch (error) {
         setState("failed");
       }finally{

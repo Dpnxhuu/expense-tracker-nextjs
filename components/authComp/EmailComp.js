@@ -1,8 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import AuthShell from "../auth/AuthShell";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 function validateField(name, value, form) {
   switch (name) {
@@ -11,11 +13,17 @@ function validateField(name, value, form) {
       return "";
     case "email":
       if (!value.trim()) return "Email is required";
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return "Enter a valid email";
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
+        return "Enter a valid email";
       return "";
     case "password":
       if (!value) return "Password is required";
-      if (value.length < 6) return "Password must be at least 6 characters";
+      if (value.length < 8) return "Password must be at least 8 characters";
+      if (!/[A-Z]/.test(value)) return "Add at least 1 uppercase letter";
+      if (!/[a-z]/.test(value)) return "Add at least 1 lowercase letter";
+      if (!/[0-9]/.test(value)) return "Add at least 1 number";
+      if (!/[^A-Za-z0-9]/.test(value))
+        return "Add at least 1 special character";
       return "";
     case "confirmPassword":
       if (!value) return "Please confirm your password";
@@ -26,11 +34,39 @@ function validateField(name, value, form) {
   }
 }
 
+const passwordRules = [
+  { label: "At least 8 characters", test: (v) => v.length >= 8 },
+  { label: "1 uppercase letter", test: (v) => /[A-Z]/.test(v) },
+  { label: "1 lowercase letter", test: (v) => /[a-z]/.test(v) },
+  { label: "1 number", test: (v) => /[0-9]/.test(v) },
+  { label: "1 special character", test: (v) => /[^A-Za-z0-9]/.test(v) },
+];
+
+function PasswordChecklist({ password }) {
+  return (
+    <ul className="mt-1.5 flex flex-col gap-1">
+      {passwordRules.map((rule) => {
+        const passed = rule.test(password);
+        return (
+          <li
+            key={rule.label}
+            className={`text-xs flex items-center gap-1.5 ${
+              passed ? "text-green-500" : "text-muted"
+            }`}
+          >
+            <span>{passed ? "✓" : "○"}</span>
+            {rule.label}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 export function VerificationSent({ email }) {
   return (
     <div className="dark-page app-gradient min-h-screen flex items-center justify-center px-4">
       <div className="glass-panel rounded-2xl p-8 max-w-md w-full text-center">
-        
         {/* Icon */}
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent/10 ring-1 ring-accent/20 mx-auto mb-5">
           <span className="text-2xl">✉️</span>
@@ -46,28 +82,17 @@ export function VerificationSent({ email }) {
           {email}
         </p>
         <p className="text-sm text-muted mb-6">
-          Click the link in the email to activate your account. The link will expire in 24 hours.
+          Click the link in the email to activate your account. The link will
+          expire in 24 hours.
         </p>
-
-        {/* Resend */}
-        {/* <div className="border-t border-border/40 pt-5">
-          <p className="text-xs text-muted/60">
-            Didn't receive the email?{" "}
-            <button className="text-accent hover:text-accent/80 transition-colors font-medium">
-              Resend verification email
-            </button>
-          </p>
-        </div> */}
-
       </div>
     </div>
-  )
+  );
 }
 
 export default function EmailComp() {
-
   const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false)
+  const [sent, setSent] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -76,19 +101,27 @@ export default function EmailComp() {
   });
   const [touched, setTouched] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
 
-  const errors = {
-    name: validateField("name", form.name, form),
-    email: validateField("email", form.email, form),
-    password: validateField("password", form.password, form),
-    confirmPassword: validateField("confirmPassword", form.confirmPassword, form),
-  };
+  const errors = useMemo(
+    () => ({
+      name: validateField("name", form.name, form),
+      email: validateField("email", form.email, form),
+      password: validateField("password", form.password, form),
+      confirmPassword: validateField(
+        "confirmPassword",
+        form.confirmPassword,
+        form,
+      ),
+    }),
+    [form],
+  );
 
   const isValid = Object.values(errors).every((e) => !e);
 
   const showError = useCallback(
     (field) => (submitted || touched[field]) && errors[field],
-    [submitted, touched, errors]
+    [submitted, touched, errors],
   );
 
   const fieldState = useCallback(
@@ -98,7 +131,7 @@ export default function EmailComp() {
         return "valid";
       return "default";
     },
-    [showError, errors, submitted, touched, form]
+    [showError, errors, submitted, touched, form],
   );
 
   const inputClass = (field) => {
@@ -116,6 +149,7 @@ export default function EmailComp() {
   const handleBlur = useCallback((e) => {
     const { name } = e.target;
     setTouched((prev) => ({ ...prev, [name]: true }));
+    if (name === "password") setPasswordFocused(false);
   }, []);
 
   const handleSubmit = useCallback(
@@ -125,36 +159,21 @@ export default function EmailComp() {
 
       if (!isValid) return;
 
-      setLoading(true)
+      setLoading(true);
 
-      try{
-
-        const res = await fetch("/api/auth/register",{
-          method: "POST",
-          headers:{
-            'Content-Type': "application/json"
-          },
-          body: JSON.stringify(form)
-        })
-
-        const data = await res.json();
-
-        if(res.ok){
-          setSent(true);
-        }else{
-          throw new Error(data.message)
-        }
-
-      }catch(error){
-        alert(error.message)
-      }finally{
-        setLoading(false)
+      try {
+        await axios.post("/api/auth/register", form);
+        setSent(true);
+      } catch (error) {
+        toast.error(error.response?.data?.error || "Something went wrong");
+      } finally {
+        setLoading(false);
       }
     },
-    [form, isValid]
+    [form, isValid],
   );
 
-  if (sent) return <VerificationSent email={form.email} />
+  if (sent) return <VerificationSent email={form.email} />;
 
   return (
     <AuthShell
@@ -178,9 +197,7 @@ export default function EmailComp() {
               className={inputClass("name")}
               autoComplete="name"
             />
-            {showError("name") && (
-              <p className="field-error">{errors.name}</p>
-            )}
+            {showError("name") && <p className="field-error">{errors.name}</p>}
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -211,13 +228,15 @@ export default function EmailComp() {
               id="password"
               name="password"
               type="password"
-              placeholder="Min. 6 characters"
+              placeholder="Min. 8 characters"
               value={form.password}
               onChange={handleChange}
               onBlur={handleBlur}
+              onFocus={() => setPasswordFocused(true)}
               className={inputClass("password")}
               autoComplete="new-password"
             />
+            {passwordFocused && <PasswordChecklist password={form.password} />}
             {showError("password") && (
               <p className="field-error">{errors.password}</p>
             )}
@@ -243,8 +262,11 @@ export default function EmailComp() {
             )}
           </div>
 
-          <button type="submit" className="btn-primary mt-1 w-full py-3 shadow-glow">
-            {loading? "Signing..." : "Sign Up"}
+          <button
+            type="submit"
+            className="btn-primary mt-1 w-full py-3 shadow-glow"
+          >
+            {loading ? "Signing..." : "Sign Up"}
           </button>
         </form>
 

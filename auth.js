@@ -219,7 +219,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (session.user) {
         session.user.id = token.id;
         session.user.emailVerified = token.emailVerified;
-        session.user.image = token.picture;
+        // session.user.image = token.picture;
       }
 
       return session;

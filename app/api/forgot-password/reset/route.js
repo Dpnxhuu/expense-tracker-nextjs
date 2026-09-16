@@ -1,17 +1,17 @@
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
 import { prisma } from "../../../../lib/prisma";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 
 const resetSchema = z.object({
   token: z.string(),
-  pass: z.string().min(8, "Password too short!"),
-});
-
-const tokenSchema = z.object({
-  id: z.number(),
-  email: z.string().email(),
+  pass: z
+    .string()
+    .min(8, "Password must be 8+ chars")
+    .regex(/[A-Z]/, "At least 1 uppercase letter required")
+    .regex(/[a-z]/, "At least 1 lowercase letter required")
+    .regex(/[0-9]/, "At least 1 number required")
+    .regex(/[^A-Za-z0-9]/, "At least 1 special character required"),
 });
 
 export async function POST(req) {
@@ -28,18 +28,22 @@ export async function POST(req) {
 
     const { token, pass } = result.data;
 
-    const decoded = tokenSchema.parse(
-      jwt.verify(token, process.env.JWT_SECRET),
-    );
+    const tokenVerify = await prisma.passwordToken.findUnique({
+      where: {token}
+    })
 
-    const user = await prisma.user.findFirst({
-      where: { email:decoded.email, passResetToken: token },
+    if(!tokenVerify || tokenVerify.expires < new Date()){
+      return NextResponse.json({error: "Invalid link or expired!"}, {status: 401})
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email: tokenVerify.identifier},
     });
 
-    if (!user) {
+    if (!user || !user.emailVerified) {
       return NextResponse.json(
-        { error: "Link already used or invalid" },
-        { status: 401 },
+        { error: "Invalid user!" },
+        { status: 404 },
       );
     }
 
@@ -49,7 +53,7 @@ export async function POST(req) {
       if (compare) {
         return NextResponse.json(
           { error: "New password can't be same as old password!" },
-          { status: 401 },
+          { status: 409 },
         );
       }
     }
@@ -57,13 +61,21 @@ export async function POST(req) {
     const hashedPass = await bcrypt.hash(pass, 10);
 
     await prisma.user.update({
-      where: { id: decoded.id },
+      where: { email: tokenVerify.identifier },
       data: {
         password: hashedPass,
-        passResetToken: null,
         tokenVersion: { increment: 1 },
       },
     });
+
+    await prisma.passwordToken.delete({
+      where: {
+        identifier_token: {
+          identifier: tokenVerify.identifier,
+          token
+        }
+      }
+    })
 
     return NextResponse.json(
       { message: "Password reset successfully" },
