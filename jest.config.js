@@ -1,11 +1,11 @@
 const nextJest = require('next/jest')
 
 const createJestConfig = nextJest({
-  dir: './', // next.config.js jahan hai
+  dir: './',
 })
 
 const customJestConfig = {
-  testEnvironment: 'node', // API routes node env mein chalte hain (browser nahi)
+  testEnvironment: 'node',
 }
 
 module.exports = createJestConfig(customJestConfig)

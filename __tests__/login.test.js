@@ -2,6 +2,11 @@ import { authorizeUser } from '../lib/authorizeUser';
 import { prisma } from '../lib/prisma';
 import bcrypt from 'bcryptjs';
 
+// 🆕 next-auth ko poora mock kar do (real package load hi nahi hoga, ESM issue khatam)
+jest.mock('next-auth', () => ({
+  CredentialsSignin: class CredentialsSignin extends Error {},
+}));
+
 jest.mock('../lib/prisma', () => ({
   prisma: {
     user: {

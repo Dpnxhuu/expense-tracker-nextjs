@@ -2,9 +2,7 @@ import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { CredentialsSignin } from "next-auth";
-import { z } from "zod";
-import {authorizeUser} from "./lib/authorizeUser"
+import { authorizeUser } from "./lib/authorizeUser";
 import { NextResponse } from "next/server";
 
 import { prisma } from "./lib/prisma";
@@ -17,19 +15,6 @@ const AUTH_PAGES = new Set([
   "/forgot-password",
   "/forgot-password/reset-password",
 ]);
-
-class InvalidCredentialsError extends CredentialsSignin {
-  code = "Invalid email or password!";
-}
-
-class UnverifiedEmailError extends CredentialsSignin {
-  code = "Verify your email!";
-}
-
-const credentialsSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-});
 
 const adapter = PrismaAdapter(prisma);
 
@@ -50,7 +35,6 @@ adapter.linkAccount = async (account) => {
     },
   });
 };
-
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter,
@@ -112,7 +96,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         },
       },
 
-      authorize: authorizeUser, // 🆕 ab yahan seedha reference diya
+      authorize: authorizeUser,
     }),
   ],
 
