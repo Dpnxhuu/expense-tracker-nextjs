@@ -18,7 +18,7 @@ describe('GET /api/auth/email-verification', () => {
     jest.clearAllMocks();
   });
 
-  it('valid token se email verify hona chahiye', async () => {
+  it('should verify email with a valid token', async () => {
     prisma.verificationToken.findUnique.mockResolvedValue({
       token: 'abc123',
       identifier: 'test@test.com',
@@ -38,7 +38,7 @@ describe('GET /api/auth/email-verification', () => {
     expect(prisma.verificationToken.delete).toHaveBeenCalledTimes(1);
   });
 
-  it('expired token pe 404 dena chahiye', async () => {
+  it('should return 404 for an expired token', async () => {
     prisma.verificationToken.findUnique.mockResolvedValue({
       token: 'abc123',
       identifier: 'test@test.com',
@@ -55,7 +55,7 @@ describe('GET /api/auth/email-verification', () => {
     expect(prisma.user.update).not.toHaveBeenCalled();
   });
 
-  it('missing token pe 404 dena chahiye', async () => {
+  it('should return 404 for a missing token', async () => {
     const req = {
       nextUrl: { searchParams: new URLSearchParams() },
     };
@@ -65,7 +65,7 @@ describe('GET /api/auth/email-verification', () => {
     expect(res.status).toBe(404);
   });
 
-  it('invalid token (DB mein nahi mila) pe 404 dena chahiye', async () => {
+  it('should return 404 for an invalid token (not found in DB)', async () => {
     prisma.verificationToken.findUnique.mockResolvedValue(null);
 
     const req = {
@@ -77,14 +77,14 @@ describe('GET /api/auth/email-verification', () => {
     expect(res.status).toBe(404);
   });
 
-  it('DB error aane pe 500 return karna chahiye', async () => {
-  prisma.verificationToken.findUnique.mockRejectedValue(new Error('DB down'));
+  it('should return 500 on DB error', async () => {
+    prisma.verificationToken.findUnique.mockRejectedValue(new Error('DB down'));
 
-  const req = {
-    nextUrl: { searchParams: new URLSearchParams({ token: 'abc123' }) },
-  };
+    const req = {
+      nextUrl: { searchParams: new URLSearchParams({ token: 'abc123' }) },
+    };
 
-  const res = await GET(req);
-  expect(res.status).toBe(500);
-});
+    const res = await GET(req);
+    expect(res.status).toBe(500);
+  });
 });

@@ -1,7 +1,7 @@
 import { POST } from '../app/api/auth/register/route';
 import { prisma } from '../lib/prisma';
 
-// Prisma ko mock kar do (real DB pe hit nahi karna)
+// mock Prisma (no real DB hit)
 jest.mock('../lib/prisma', () => ({
   prisma: {
     user: {
@@ -14,18 +14,18 @@ jest.mock('../lib/prisma', () => ({
   },
 }));
 
-// Email bhejne wale function ko bhi mock karo (real email na jaaye)
+// mock the email-sending function (no real email should go out)
 jest.mock('../lib/mailer', () => ({
   sendVerificationEmail: jest.fn(),
 }));
 
 describe('POST /api/auth/signup', () => {
   beforeEach(() => {
-    jest.clearAllMocks(); // har test se pehle saare mocks reset
+    jest.clearAllMocks(); // reset all mocks before each test
   });
 
-  it('naya user successfully create hona chahiye', async () => {
-    prisma.user.findUnique.mockResolvedValue(null); // user exist nahi karta
+  it('should successfully create a new user', async () => {
+    prisma.user.findUnique.mockResolvedValue(null); // user does not exist
     prisma.user.create.mockResolvedValue({ id: 1, email: 'test@test.com' });
 
     const req = new Request('http://localhost/api/auth/signup', {
@@ -45,7 +45,7 @@ describe('POST /api/auth/signup', () => {
     expect(prisma.user.create).toHaveBeenCalledTimes(1);
   });
 
-  it('duplicate email pe 409 error dena chahiye', async () => {
+  it('should return 409 for a duplicate email', async () => {
     prisma.user.findUnique.mockResolvedValue({ id: 1, email: 'test@test.com' });
 
     const req = new Request('http://localhost/api/auth/signup', {
@@ -64,7 +64,7 @@ describe('POST /api/auth/signup', () => {
     expect(data.error).toBe('User already exist!');
   });
 
-  it('weak password pe 400 error dena chahiye', async () => {
+  it('should return 400 for a weak password', async () => {
     const req = new Request('http://localhost/api/auth/signup', {
       method: 'POST',
       body: JSON.stringify({
@@ -78,19 +78,19 @@ describe('POST /api/auth/signup', () => {
     expect(res.status).toBe(400);
   });
 
-  it('DB error aane pe 500 return karna chahiye', async () => {
-  prisma.user.findUnique.mockRejectedValue(new Error('DB down'));
+  it('should return 500 on DB error', async () => {
+    prisma.user.findUnique.mockRejectedValue(new Error('DB down'));
 
-  const req = new Request('http://localhost/api/auth/signup', {
-    method: 'POST',
-    body: JSON.stringify({
-      name: 'Deepanshu',
-      email: 'test@test.com',
-      password: 'Pass@1234',
-    }),
+    const req = new Request('http://localhost/api/auth/signup', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: 'Deepanshu',
+        email: 'test@test.com',
+        password: 'Pass@1234',
+      }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(500);
   });
-
-  const res = await POST(req);
-  expect(res.status).toBe(500);
-});
 });

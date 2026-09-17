@@ -2,7 +2,7 @@ import { authorizeUser } from '../lib/authorizeUser';
 import { prisma } from '../lib/prisma';
 import bcrypt from 'bcryptjs';
 
-// 🆕 next-auth ko poora mock kar do (real package load hi nahi hoga, ESM issue khatam)
+// fully mock next-auth (real package never loads, avoids the ESM issue)
 jest.mock('next-auth', () => ({
   CredentialsSignin: class CredentialsSignin extends Error {},
 }));
@@ -24,14 +24,14 @@ describe('authorizeUser (login logic)', () => {
     jest.clearAllMocks();
   });
 
-  it('valid credentials se user return hona chahiye', async () => {
+  it('should return the user for valid credentials', async () => {
     prisma.user.findUnique.mockResolvedValue({
       id: 1,
       email: 'test@test.com',
       password: 'hashedpass',
       emailVerified: new Date(),
     });
-    bcrypt.compare.mockResolvedValue(true); // password match
+    bcrypt.compare.mockResolvedValue(true); // password matches
 
     const result = await authorizeUser({
       email: 'test@test.com',
@@ -41,26 +41,26 @@ describe('authorizeUser (login logic)', () => {
     expect(result.email).toBe('test@test.com');
   });
 
-  it('wrong password pe error throw karna chahiye', async () => {
+  it('should throw an error for wrong password', async () => {
     prisma.user.findUnique.mockResolvedValue({
       id: 1,
       email: 'test@test.com',
       password: 'hashedpass',
       emailVerified: new Date(),
     });
-    bcrypt.compare.mockResolvedValue(false); // password galat
+    bcrypt.compare.mockResolvedValue(false); // password doesn't match
 
     await expect(
       authorizeUser({ email: 'test@test.com', password: 'wrongpass' })
     ).rejects.toThrow();
   });
 
-  it('unverified email pe error throw karna chahiye', async () => {
+  it('should throw an error for unverified email', async () => {
     prisma.user.findUnique.mockResolvedValue({
       id: 1,
       email: 'test@test.com',
       password: 'hashedpass',
-      emailVerified: null, // verify nahi hai
+      emailVerified: null, // not verified
     });
 
     await expect(
@@ -68,7 +68,7 @@ describe('authorizeUser (login logic)', () => {
     ).rejects.toThrow();
   });
 
-  it('user exist na kare toh error throw karna chahiye', async () => {
+  it('should throw an error if user does not exist', async () => {
     prisma.user.findUnique.mockResolvedValue(null);
 
     await expect(
@@ -76,7 +76,7 @@ describe('authorizeUser (login logic)', () => {
     ).rejects.toThrow();
   });
 
-  it('invalid email format pe error throw karna chahiye', async () => {
+  it('should throw an error for invalid email format', async () => {
     await expect(
       authorizeUser({ email: 'notanemail', password: 'Pass@1234' })
     ).rejects.toThrow();
