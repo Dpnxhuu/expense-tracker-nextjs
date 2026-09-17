@@ -129,4 +129,41 @@ describe('POST /api/forgot-password/reset-password', () => {
     expect(res.status).toBe(404);
     expect(data.error).toBe('Invalid user!');
   });
+
+  it('DB error aane pe 500 return karna chahiye', async () => {
+  prisma.passwordToken.findUnique.mockRejectedValue(new Error('DB down'));
+
+  const req = new Request('http://localhost/api/forgot-password/reset-password', {
+    method: 'POST',
+    body: JSON.stringify({ token: 'abc123', pass: 'NewPass@123' }),
+  });
+
+  const res = await POST(req);
+  expect(res.status).toBe(500);
+});
+
+it('Google-signup user (password null) ke case mein bhi kaam karna chahiye', async () => {
+  prisma.passwordToken.findUnique.mockResolvedValue({
+    token: 'abc123',
+    identifier: 'test@test.com',
+    expires: new Date(Date.now() + 10000),
+  });
+  prisma.user.findUnique.mockResolvedValue({
+    id: 1,
+    email: 'test@test.com',
+    emailVerified: new Date(),
+    password: null, // Google se signup kiya, password nahi hai
+  });
+  bcrypt.hash.mockResolvedValue('newhashedpass');
+  prisma.user.update.mockResolvedValue({});
+  prisma.passwordToken.delete.mockResolvedValue({});
+
+  const req = new Request('http://localhost/api/forgot-password/reset-password', {
+    method: 'POST',
+    body: JSON.stringify({ token: 'abc123', pass: 'NewPass@123' }),
+  });
+
+  const res = await POST(req);
+  expect(res.status).toBe(201);
+});
 });

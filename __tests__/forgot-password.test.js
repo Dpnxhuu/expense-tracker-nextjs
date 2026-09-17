@@ -86,4 +86,17 @@ describe('POST /api/forgot-password', () => {
     const res = await POST(req);
     expect(res.status).toBe(400);
   });
+
+
+  it('DB error aane pe 500 return karna chahiye', async () => {
+  prisma.user.findUnique.mockRejectedValue(new Error('DB down'));
+
+  const req = new Request('http://localhost/api/forgot-password', {
+    method: 'POST',
+    body: JSON.stringify({ email: 'test@test.com' }),
+  });
+
+  const res = await POST(req);
+  expect(res.status).toBe(500);
+});
 });

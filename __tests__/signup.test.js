@@ -77,4 +77,20 @@ describe('POST /api/auth/signup', () => {
     const res = await POST(req);
     expect(res.status).toBe(400);
   });
+
+  it('DB error aane pe 500 return karna chahiye', async () => {
+  prisma.user.findUnique.mockRejectedValue(new Error('DB down'));
+
+  const req = new Request('http://localhost/api/auth/signup', {
+    method: 'POST',
+    body: JSON.stringify({
+      name: 'Deepanshu',
+      email: 'test@test.com',
+      password: 'Pass@1234',
+    }),
+  });
+
+  const res = await POST(req);
+  expect(res.status).toBe(500);
+});
 });

@@ -76,4 +76,15 @@ describe('GET /api/auth/email-verification', () => {
 
     expect(res.status).toBe(404);
   });
+
+  it('DB error aane pe 500 return karna chahiye', async () => {
+  prisma.verificationToken.findUnique.mockRejectedValue(new Error('DB down'));
+
+  const req = {
+    nextUrl: { searchParams: new URLSearchParams({ token: 'abc123' }) },
+  };
+
+  const res = await GET(req);
+  expect(res.status).toBe(500);
+});
 });
